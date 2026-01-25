@@ -116,22 +116,24 @@ const LoginPage = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
                         <FormInput
-                            label="Email address"
+                            label=""
+                            placeholder='Email address'
                             type="email"
                             sizeVariant="family"
                             {...register('email')}
                             error={errors.email?.message}
-                            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white pl-2"
                             containerClassName="mb-4"
                         />
 
                         <FormInput
-                            label="Password"
+                            label=""
+                            placeholder='Password'
                             type="password"
                             sizeVariant="family"
                             {...register('password')}
                             error={errors.password?.message}
-                            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white pl-2"
                             containerClassName="mb-2"
                         />
 

@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Lock, Calendar, Phone, Link as LinkIcon, Check, ChevronRight, ChevronLeft } from 'lucide-react';
+import { User, Mail, Lock, Calendar, Phone, Link as LinkIcon, Check, ChevronRight, ChevronLeft, Heart, Sun, Sparkles } from 'lucide-react';
+import { z } from 'zod';
 
 import {
-    AuthLayout,
-    FormInput,
-    GradientButton,
+    OAuthButton,
     signUpElder,
     elderSignupSchema,
-    type ElderSignupFormData,
     getFriendlyErrorMessage
 } from '@elder-nest/shared';
+
+type ElderSignupFormData = z.infer<typeof elderSignupSchema>;
 
 const SignupPage = () => {
     const navigate = useNavigate();
@@ -21,19 +21,16 @@ const SignupPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Initialize form
     const { register, handleSubmit, trigger, formState: { errors } } = useForm<ElderSignupFormData>({
         resolver: zodResolver(elderSignupSchema),
         mode: 'onChange'
     });
 
-    // Step validation
     const nextStep = async () => {
         let fieldsToValidate: (keyof ElderSignupFormData)[] = [];
         if (step === 1) fieldsToValidate = ['fullName', 'email', 'password', 'confirmPassword'];
         if (step === 2) fieldsToValidate = ['dateOfBirth', 'emergencyContact'];
 
-        // Trigger validation for current step
         const isValid = await trigger(fieldsToValidate);
         if (isValid) {
             setStep(prev => prev + 1);
@@ -48,8 +45,6 @@ const SignupPage = () => {
         setError(null);
         try {
             await signUpElder(data);
-            // Success!
-            // In a real app we might show a success screen here before redirecting
             navigate('/auth/profile-setup');
         } catch (err: any) {
             setError(getFriendlyErrorMessage(err.code));
@@ -58,202 +53,423 @@ const SignupPage = () => {
         }
     };
 
-    // Progress Bar
-    const renderProgress = () => (
-        <div className="flex justify-center gap-4 mb-8">
-            {[1, 2, 3].map((s) => (
-                <motion.div
-                    key={s}
-                    initial={false}
-                    animate={{
-                        scale: s === step ? 1.2 : 1,
-                        backgroundColor: s <= step ? '#6366F1' : '#E5E7EB'
-                    }}
-                    className="w-4 h-4 rounded-full transition-colors duration-300"
-                />
-            ))}
-        </div>
-    );
+    const stepTitles = [
+        { title: 'Account Details', subtitle: 'Create your login credentials' },
+        { title: 'Personal Info', subtitle: 'Tell us a bit about yourself' },
+        { title: 'Family Connection', subtitle: 'Connect with your loved ones' }
+    ];
 
     return (
-        <AuthLayout backgroundVariant="elder" showBackButton={step === 1}>
-            <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-white/50 max-w-xl mx-auto">
-
-                <div className="text-center mb-6">
-                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-teal-600 mb-2">
-                        Create Your Account
-                    </h2>
-                    <p className="text-gray-500 font-medium">Step {step} of 3</p>
+        <div className="h-screen flex overflow-hidden">
+            {/* Left Panel - Warm Gradient with Branding */}
+            <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="hidden lg:flex lg:w-5/12 relative overflow-hidden"
+                style={{
+                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)'
+                }}
+            >
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-10">
+                    <div className="absolute top-20 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-40 right-20 w-48 h-48 bg-white rounded-full blur-3xl"></div>
                 </div>
 
-                {renderProgress()}
+                {/* Floating Icons */}
+                <motion.div 
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute top-24 right-16 text-white/30"
+                >
+                    <Sun size={40} />
+                </motion.div>
+                <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute bottom-32 left-12 text-white/25"
+                >
+                    <Heart size={36} fill="currentColor" />
+                </motion.div>
+                <motion.div 
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="absolute top-1/2 right-8 text-white/20"
+                >
+                    <Sparkles size={32} />
+                </motion.div>
 
-                <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Content */}
+                <div className="relative z-10 flex flex-col justify-between p-8 text-white h-full">
+                    {/* Logo & Brand */}
+                    <div>
+                        <div className="flex items-center gap-3 mb-10">
+                            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                <Heart className="w-6 h-6 text-white" fill="currentColor" />
+                            </div>
+                            <span className="text-xl font-bold tracking-tight">ElderNest</span>
+                        </div>
 
-                    <AnimatePresence mode="wait">
-                        {step === 1 && (
-                            <motion.div
-                                key="step1"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-4"
-                            >
-                                <FormInput
-                                    label="Full Name"
-                                    icon={User}
-                                    sizeVariant="elder"
-                                    {...register('fullName')}
-                                    error={errors.fullName?.message}
-                                />
-                                <FormInput
-                                    label="Email Address"
-                                    type="email"
-                                    icon={Mail}
-                                    sizeVariant="elder"
-                                    {...register('email')}
-                                    error={errors.email?.message}
-                                />
-                                <FormInput
-                                    label="Password"
-                                    type="password"
-                                    icon={Lock}
-                                    sizeVariant="elder"
-                                    {...register('password')}
-                                    error={errors.password?.message}
-                                />
-                                <FormInput
-                                    label="Confirm Password"
-                                    type="password"
-                                    icon={Lock}
-                                    sizeVariant="elder"
-                                    {...register('confirmPassword')}
-                                    error={errors.confirmPassword?.message}
-                                />
-                            </motion.div>
-                        )}
-
-                        {step === 2 && (
-                            <motion.div
-                                key="step2"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-4"
-                            >
-                                <div className="bg-blue-50 p-4 rounded-xl mb-4 text-blue-800 text-lg">
-                                    We need a few details to customize your experience.
-                                </div>
-                                <FormInput
-                                    label="Date of Birth"
-                                    type="date"
-                                    icon={Calendar}
-                                    sizeVariant="elder"
-                                    {...register('dateOfBirth')}
-                                    error={errors.dateOfBirth?.message?.toString()}
-                                />
-                                <FormInput
-                                    label="Emergency Contact (Phone)"
-                                    type="tel"
-                                    icon={Phone}
-                                    sizeVariant="elder"
-                                    {...register('emergencyContact')}
-                                    error={errors.emergencyContact?.message}
-                                    placeholder="e.g. +1 234 567 8900"
-                                />
-                            </motion.div>
-                        )}
-
-                        {step === 3 && (
-                            <motion.div
-                                key="step3"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-4"
-                            >
-                                <div className="text-center mb-6">
-                                    <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600">
-                                        <LinkIcon size={32} />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-800">Family Connection</h3>
-                                    <p className="text-gray-500 mt-2">
-                                        If a family member gave you a code, enter it below. Otherwise, you can skip this.
-                                    </p>
-                                </div>
-
-                                <FormInput
-                                    label="Connection Code (Optional)"
-                                    icon={LinkIcon}
-                                    sizeVariant="elder"
-                                    {...register('connectionCode')}
-                                    error={errors.connectionCode?.message}
-                                    placeholder="XXX-XXX"
-                                    className="text-center tracking-widest uppercase font-mono"
-                                    maxLength={6}
-                                />
-
-                                <div className="flex items-start gap-3 mt-6 p-4 bg-gray-50 rounded-xl">
-                                    <input
-                                        type="checkbox"
-                                        {...register('agreeToTerms')}
-                                        className="w-6 h-6 mt-1 text-indigo-600"
-                                    />
-                                    <div className="text-sm text-gray-600">
-                                        I agree to the <span className="text-indigo-600 underline">Terms of Service</span> and <span className="text-indigo-600 underline">Privacy Policy</span>.
-                                    </div>
-                                </div>
-                                {errors.agreeToTerms && (
-                                    <p className="text-red-500 text-sm ml-2 mt-1">{errors.agreeToTerms.message}</p>
-                                )}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Navigation Buttons */}
-                    <div className="mt-8 flex gap-4">
-                        {step > 1 && (
-                            <GradientButton
-                                type="button"
-                                onClick={prevStep}
-                                variant="secondary"
-                                size="elder"
-                                className="w-1/3"
-                            >
-                                <ChevronLeft /> Back
-                            </GradientButton>
-                        )}
-
-                        {step < 3 ? (
-                            <GradientButton
-                                type="button"
-                                onClick={nextStep}
-                                size="elder"
-                                className="flex-1"
-                            >
-                                Next <ChevronRight />
-                            </GradientButton>
-                        ) : (
-                            <GradientButton
-                                type="submit"
-                                loading={isLoading}
-                                size="elder"
-                                className="flex-1"
-                            >
-                                Complete Signup <Check />
-                            </GradientButton>
-                        )}
+                        <h1 className="text-3xl font-bold leading-tight mb-3">
+                            Start your journey<br />
+                            to a <span className="text-yellow-200">healthier life</span>
+                        </h1>
+                        <p className="text-base text-white/80 max-w-sm leading-relaxed">
+                            Join thousands of elders who are taking control of their health with our easy-to-use platform.
+                        </p>
                     </div>
 
-                    {error && (
-                        <div className="mt-4 text-center text-red-500 font-medium bg-red-50 p-2 rounded-lg">
-                            {error}
-                        </div>
-                    )}
+                    {/* Step Progress */}
+                    <div className="space-y-3">
+                        {[1, 2, 3].map((s) => (
+                            <div 
+                                key={s} 
+                                className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                                    s === step ? 'bg-white/20 backdrop-blur-sm' : 'opacity-60'
+                                }`}
+                            >
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                    s < step ? 'bg-green-400 text-white' : 
+                                    s === step ? 'bg-white text-orange-500' : 
+                                    'bg-white/30 text-white'
+                                }`}>
+                                    {s < step ? <Check size={16} /> : s}
+                                </div>
+                                <div>
+                                    <p className="font-medium text-sm">{stepTitles[s-1].title}</p>
+                                    <p className="text-xs text-white/70">{stepTitles[s-1].subtitle}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
-                </form>
-            </div>
-        </AuthLayout>
+                    {/* Already have account */}
+                    <p className="text-white/80 text-sm">
+                        Already have an account?{' '}
+                        <Link to="/auth/login" className="text-white font-semibold hover:underline">
+                            Sign In
+                        </Link>
+                    </p>
+                </div>
+            </motion.div>
+
+            {/* Right Panel - Form */}
+            <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="w-full lg:w-7/12 flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+                style={{ backgroundColor: '#fefcfb' }}
+            >
+                <div className="w-full max-w-md">
+                    {/* Mobile Header */}
+                    <div className="lg:hidden mb-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Heart className="w-6 h-6 text-orange-500" fill="currentColor" />
+                            <span className="text-lg font-bold text-gray-800">ElderNest</span>
+                        </div>
+                    </div>
+
+                    {/* Step Indicator (Mobile) */}
+                    <div className="lg:hidden flex justify-center gap-2 mb-6">
+                        {[1, 2, 3].map((s) => (
+                            <div 
+                                key={s}
+                                className={`w-3 h-3 rounded-full transition-all ${
+                                    s <= step ? 'bg-orange-500' : 'bg-gray-200'
+                                } ${s === step ? 'scale-125' : ''}`}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Header */}
+                    <div className="mb-6 text-center lg:text-left">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">{stepTitles[step-1].title}</h2>
+                        <p className="text-gray-500 text-sm">{stepTitles[step-1].subtitle}</p>
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <AnimatePresence mode="wait">
+                            {step === 1 && (
+                                <motion.div
+                                    key="step1"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="space-y-4"
+                                >
+                                    {/* Full Name */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Full Name</label>
+                                        <div className="relative">
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                {...register('fullName')}
+                                                placeholder="Enter your full name"
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                                            />
+                                        </div>
+                                        {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
+                                    </div>
+
+                                    {/* Email */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Email Address</label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                type="email"
+                                                {...register('email')}
+                                                placeholder="your.email@example.com"
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                                            />
+                                        </div>
+                                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                                    </div>
+
+                                    {/* Password */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Password</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                type="password"
+                                                {...register('password')}
+                                                placeholder="Create a password"
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                                            />
+                                        </div>
+                                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+                                    </div>
+
+                                    {/* Confirm Password */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Confirm Password</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                type="password"
+                                                {...register('confirmPassword')}
+                                                placeholder="Confirm your password"
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                                            />
+                                        </div>
+                                        {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {step === 2 && (
+                                <motion.div
+                                    key="step2"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="space-y-4"
+                                >
+                                    <div className="bg-orange-50 p-3 rounded-xl text-orange-800 text-sm">
+                                        We need a few details to personalize your experience.
+                                    </div>
+
+                                    {/* Date of Birth */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Date of Birth</label>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                type="date"
+                                                {...register('dateOfBirth')}
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                                            />
+                                        </div>
+                                        {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth.message?.toString()}</p>}
+                                    </div>
+
+                                    {/* Emergency Contact with Country Code */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Emergency Contact</label>
+                                        <div className="flex gap-2">
+                                            <select
+                                                className="w-28 px-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white text-sm"
+                                                onChange={(e) => {
+                                                    const phoneInput = document.getElementById('emergencyPhone') as HTMLInputElement;
+                                                    if (phoneInput) {
+                                                        const currentVal = phoneInput.value.replace(/^\+\d+\s?/, '');
+                                                        phoneInput.value = e.target.value + ' ' + currentVal;
+                                                        phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                                    }
+                                                }}
+                                            >
+                                                <option value="+1">🇺🇸 +1</option>
+                                                <option value="+44">🇬🇧 +44</option>
+                                                <option value="+91">🇮🇳 +91</option>
+                                                <option value="+61">🇦🇺 +61</option>
+                                                <option value="+86">🇨🇳 +86</option>
+                                                <option value="+81">🇯🇵 +81</option>
+                                                <option value="+49">🇩🇪 +49</option>
+                                                <option value="+33">🇫🇷 +33</option>
+                                                <option value="+39">🇮🇹 +39</option>
+                                                <option value="+7">🇷🇺 +7</option>
+                                                <option value="+55">🇧🇷 +55</option>
+                                                <option value="+971">🇦🇪 +971</option>
+                                                <option value="+65">🇸🇬 +65</option>
+                                                <option value="+60">🇲🇾 +60</option>
+                                            </select>
+                                            <div className="relative flex-1">
+                                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                <input
+                                                    id="emergencyPhone"
+                                                    type="tel"
+                                                    {...register('emergencyContact')}
+                                                    placeholder="+1 234 567 8900"
+                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                                                />
+                                            </div>
+                                        </div>
+                                        {errors.emergencyContact && <p className="text-red-500 text-xs mt-1">{errors.emergencyContact.message}</p>}
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {step === 3 && (
+                                <motion.div
+                                    key="step3"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="space-y-4"
+                                >
+                                    <div className="text-center mb-4">
+                                        <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-3 text-white">
+                                            <LinkIcon size={28} />
+                                        </div>
+                                        <p className="text-gray-500 text-sm">
+                                            If a family member gave you a code, enter it below. Otherwise, you can skip this.
+                                        </p>
+                                    </div>
+
+                                    {/* Connection Code */}
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-1 text-sm">Connection Code (Optional)</label>
+                                        <div className="relative">
+                                            <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                {...register('connectionCode')}
+                                                placeholder="XXX-XXX"
+                                                maxLength={6}
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white text-center tracking-widest uppercase font-mono"
+                                            />
+                                        </div>
+                                        {errors.connectionCode && <p className="text-red-500 text-xs mt-1">{errors.connectionCode.message}</p>}
+                                    </div>
+
+                                    {/* Terms */}
+                                    <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                        <input
+                                            type="checkbox"
+                                            {...register('agreeToTerms')}
+                                            className="w-5 h-5 mt-0.5 text-orange-500 rounded focus:ring-orange-400"
+                                        />
+                                        <p className="text-sm text-gray-600">
+                                            I agree to the <Link to="#" className="text-orange-500 underline">Terms of Service</Link> and <Link to="#" className="text-orange-500 underline">Privacy Policy</Link>
+                                        </p>
+                                    </div>
+                                    {errors.agreeToTerms && <p className="text-red-500 text-xs">{errors.agreeToTerms.message}</p>}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Error Message */}
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-center text-sm font-medium"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
+
+                        {/* Navigation Buttons */}
+                        <div className="mt-6 flex gap-3">
+                            {step > 1 && (
+                                <motion.button
+                                    type="button"
+                                    onClick={prevStep}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="px-6 py-3 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                >
+                                    <ChevronLeft size={18} /> Back
+                                </motion.button>
+                            )}
+
+                            {step < 3 ? (
+                                <motion.button
+                                    type="button"
+                                    onClick={nextStep}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="flex-1 py-3 font-semibold text-white rounded-xl transition-all flex items-center justify-center gap-2"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)'
+                                    }}
+                                >
+                                    Continue <ChevronRight size={18} />
+                                </motion.button>
+                            ) : (
+                                <motion.button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="flex-1 py-3 font-semibold text-white rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)'
+                                    }}
+                                >
+                                    {isLoading ? (
+                                        <span className="flex items-center gap-2">
+                                            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                            </svg>
+                                            Creating Account...
+                                        </span>
+                                    ) : (
+                                        <>Complete Signup <Check size={18} /></>
+                                    )}
+                                </motion.button>
+                            )}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="relative flex items-center py-4 mt-4">
+                            <div className="flex-grow border-t border-gray-200"></div>
+                            <span className="px-4 text-gray-400 text-xs">Or sign up with</span>
+                            <div className="flex-grow border-t border-gray-200"></div>
+                        </div>
+
+                        {/* Google Signup */}
+                        <OAuthButton
+                            role="elder"
+                            onSuccess={() => navigate('/auth/profile-setup')}
+                            onError={(msg) => setError(msg)}
+                        />
+
+                        {/* Mobile Sign In Link */}
+                        <p className="lg:hidden text-center text-gray-600 text-sm mt-4">
+                            Already have an account?{' '}
+                            <Link to="/auth/login" className="text-orange-500 font-semibold">
+                                Sign In
+                            </Link>
+                        </p>
+                    </form>
+                </div>
+            </motion.div>
+        </div>
     );
 };
 

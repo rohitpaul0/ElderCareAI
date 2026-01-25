@@ -17,6 +17,7 @@ import {
     serverTimestamp
 } from 'firebase/firestore';
 import { auth, db } from './config';
+export { auth, db };
 import { ElderUser, FamilyUser } from '../../types/user';
 
 // --- Auth Utilities ---
@@ -36,7 +37,7 @@ export const mapFirebaseUserToUser = async (firebaseUser: User | null): Promise<
 // --- Sign Up ---
 
 export const signUpElder = async (data: any) => {
-    const { email, password, fullName, age, emergencyContact, connectionCode: _connectionCode } = data;
+    const { email, password, fullName, dateOfBirth, emergencyContact, connectionCode: _connectionCode } = data;
 
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -45,6 +46,11 @@ export const signUpElder = async (data: any) => {
 
     // Generate own connection code for others to join (simple random for now)
     const myConnectionCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Calculate age from dateOfBirth
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
 
     const elderData: Omit<ElderUser, 'createdAt' | 'lastActive' | 'uid'> = {
         email,

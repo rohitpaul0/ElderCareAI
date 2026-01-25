@@ -1,6 +1,7 @@
 export * from './types/user';
 export * from './lib/firebase/auth';
 export * from './lib/validation/auth';
+export type { LoginFormData, ForgotPasswordFormData, ElderSignupFormData, FamilySignupFormData } from './lib/validation/auth';
 export * from './lib/animations';
 export * from './utils/errorMessages';
 

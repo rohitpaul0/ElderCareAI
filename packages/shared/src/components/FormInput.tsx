@@ -105,7 +105,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                            className="absolute right-4 bottom-0 top-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
                         >
                             {showPassword ? <EyeOff size={iconSize} /> : <Eye size={iconSize} />}
                         </button>

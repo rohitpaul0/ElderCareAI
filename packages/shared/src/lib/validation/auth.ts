@@ -20,12 +20,7 @@ export const elderSignupSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
-    dateOfBirth: z.string().min(1, 'Please enter your date of birth').refine((val) => {
-        const date = new Date(val);
-        const today = new Date();
-        const age = today.getFullYear() - date.getFullYear();
-        return age >= 50 && age <= 120;
-    }, { message: 'You must be at least 50 years old' }),
+    dateOfBirth: z.string().min(1, 'Please enter your date of birth'),
     emergencyContact: z.string().regex(phoneRegex, 'Please enter a valid phone number with country code (e.g., +1 234 567 8900)'),
     connectionCode: z.string().length(6, 'Code must be exactly 6 characters').optional().or(z.literal('')),
     agreeToTerms: z.literal(true, { errorMap: () => ({ message: "You must agree to the Terms and Privacy Policy" }) }),

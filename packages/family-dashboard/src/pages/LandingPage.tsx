@@ -4,6 +4,19 @@ import { ArrowRight, Heart, Shield } from "lucide-react";
 
 export const LandingPage = () => {
     const navigate = useNavigate();
+    
+    // Elder app runs on port 5174
+    const elderAppUrl = import.meta.env.VITE_ELDER_APP_URL || 'http://localhost:5174';
+
+    const handleElderPortalClick = () => {
+        // Redirect to elder-app login page (separate application on port 5174)
+        window.location.href = `${elderAppUrl}/auth/login`;
+    };
+
+    const handleFamilyPortalClick = () => {
+        // Navigate to family dashboard login (same application)
+        navigate('/auth/login?role=family');
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
@@ -21,7 +34,7 @@ export const LandingPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Elder Portal */}
                     <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer border-2 border-transparent hover:border-green-400"
-                        onClick={() => navigate('/auth/login?role=elder')}>
+                        onClick={handleElderPortalClick}>
                         <div className="bg-green-100 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-200 transition-colors">
                             <Heart className="w-8 h-8 text-green-700" />
                         </div>
@@ -38,7 +51,7 @@ export const LandingPage = () => {
 
                     {/* Family Portal */}
                     <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer border-2 border-transparent hover:border-blue-400"
-                        onClick={() => navigate('/auth/login?role=family')}>
+                        onClick={handleFamilyPortalClick}>
                         <div className="bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-200 transition-colors">
                             <Shield className="w-8 h-8 text-blue-700" />
                         </div>
@@ -57,3 +70,4 @@ export const LandingPage = () => {
         </div>
     );
 };
+

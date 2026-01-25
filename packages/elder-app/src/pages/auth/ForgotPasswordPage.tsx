@@ -3,14 +3,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { Mail, CheckCircle, ArrowLeft } from 'lucide-react';
+import { z } from 'zod';
 import {
     AuthLayout,
     FormInput,
     GradientButton,
     sendPasswordResetEmail,
-    forgotPasswordSchema,
-    ForgotPasswordFormData
+    forgotPasswordSchema
 } from '@elder-nest/shared';
+
+// Infer the type locally from forgotPasswordSchema
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPasswordPage = () => {
     const [isSent, setIsSent] = useState(false);

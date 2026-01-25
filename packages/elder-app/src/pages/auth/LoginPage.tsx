@@ -3,23 +3,24 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Heart } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Heart, Sun, Leaf } from 'lucide-react';
+import { z } from 'zod';
 
 import {
-    AuthLayout,
-    FormInput,
-    GradientButton,
     OAuthButton,
     signInWithEmail,
     loginSchema,
-    LoginFormData,
     getFriendlyErrorMessage
 } from '@elder-nest/shared';
+
+// Infer the type locally from loginSchema
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
@@ -42,109 +43,239 @@ const LoginPage = () => {
     };
 
     return (
-        <AuthLayout
-            backgroundVariant="elder"
-            showBackButton={true}
-            title="Welcome Back"
-            subtitle="We missed you!"
-        >
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border-2 border-white/50 relative overflow-hidden">
-
-                {/* Decorative Heart */}
-                <div className="absolute top-6 right-6 text-pink-400 rotate-12 animate-pulse">
-                    <Heart fill="currentColor" size={32} />
+        <div className="h-screen flex overflow-hidden">
+            {/* Left Panel - Warm Gradient with Branding */}
+            <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
+                style={{
+                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)'
+                }}
+            >
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-10">
+                    <div className="absolute top-20 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-40 right-20 w-48 h-48 bg-white rounded-full blur-3xl"></div>
+                    <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-white rounded-full blur-2xl"></div>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Floating Icons */}
+                <motion.div 
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute top-32 right-20 text-white/30"
+                >
+                    <Sun size={48} />
+                </motion.div>
+                <motion.div 
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="absolute bottom-60 left-16 text-white/20"
+                >
+                    <Leaf size={56} />
+                </motion.div>
+                <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute top-1/2 right-32 text-white/25"
+                >
+                    <Heart size={40} fill="currentColor" />
+                </motion.div>
 
-                    {/* Email Field */}
-                    <FormInput
-                        label="Email Address"
-                        type="email"
-                        icon={Mail}
-                        sizeVariant="elder"
-                        {...register('email')}
-                        error={errors.email?.message}
-                        placeholder="your.email@example.com"
-                    />
+                {/* Content */}
+                <div className="relative z-10 flex flex-col justify-between p-8 text-white h-full">
+                    {/* Logo & Brand */}
+                    <div>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                <Heart className="w-7 h-7 text-white" fill="currentColor" />
+                            </div>
+                            <span className="text-2xl font-bold tracking-tight">ElderNest</span>
+                        </div>
 
-                    {/* Password Field */}
-                    <FormInput
-                        label="Password"
-                        type="password"
-                        icon={Lock}
-                        sizeVariant="elder"
-                        {...register('password')}
-                        error={errors.password?.message}
-                    />
-
-                    {/* Remember Me & Forgot Password */}
-                    <div className="flex items-center justify-between mt-2 mb-6">
-                        <label className="flex items-center space-x-3 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                {...register('rememberMe')}
-                                className="w-6 h-6 border-2 border-gray-300 rounded text-indigo-600 focus:ring-indigo-500 transition duration-150 ease-in-out"
-                            />
-                            <span className="text-gray-600 text-lg">Keep me signed in</span>
-                        </label>
-
-                        <Link
-                            to="/auth/forgot-password"
-                            className="text-indigo-600 hover:text-indigo-800 font-medium text-lg transition-colors underline decoration-transparent hover:decoration-indigo-600"
-                        >
-                            Forgot Password?
-                        </Link>
-                    </div>
-
-                    {/* Error Message */}
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, shake: 10 }}
-                            animate={{ opacity: 1, x: [0, -10, 10, 0] }}
-                            className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-center font-medium"
-                        >
-                            {error}
-                        </motion.div>
-                    )}
-
-                    {/* Submit Button */}
-                    <GradientButton
-                        type="submit"
-                        size="elder"
-                        loading={isLoading}
-                        className="w-full text-xl mt-4"
-                    >
-                        Sign In
-                    </GradientButton>
-
-                    {/* Divider */}
-                    <div className="relative flex py-5 items-center">
-                        <div className="flex-grow border-t border-gray-300"></div>
-                        <span className="flex-shrink-0 mx-4 text-gray-500 text-lg">or continue with</span>
-                        <div className="flex-grow border-t border-gray-300"></div>
-                    </div>
-
-                    {/* Social Login */}
-                    <OAuthButton
-                        role="elder"
-                        onSuccess={() => navigate('/')}
-                        onError={(msg) => setError(msg)}
-                    />
-
-                    {/* Footer */}
-                    <div className="mt-8 text-center">
-                        <p className="text-gray-600 text-lg">
-                            Don't have an account?{' '}
-                            <Link to="/auth/signup" className="text-indigo-600 font-bold hover:underline text-xl">
-                                Sign Up
-                            </Link>
+                        {/* Main Tagline */}
+                        <h1 className="text-4xl font-bold leading-tight mb-4">
+                            Your companion<br />
+                            for a healthier,<br />
+                            <span className="text-yellow-200">happier life.</span>
+                        </h1>
+                        <p className="text-lg text-white/80 max-w-md leading-relaxed">
+                            Simple health tracking, timely reminders, and caring support - all designed just for you.
                         </p>
                     </div>
 
-                </form>
-            </div>
-        </AuthLayout>
+                    {/* Testimonial */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="flex -space-x-2">
+                                <div className="w-8 h-8 bg-orange-300 rounded-full border-2 border-white/50"></div>
+                                <div className="w-8 h-8 bg-pink-300 rounded-full border-2 border-white/50"></div>
+                                <div className="w-8 h-8 bg-purple-300 rounded-full border-2 border-white/50"></div>
+                            </div>
+                            <span className="text-white/90 font-medium text-sm">Loved by 5,000+ elders</span>
+                        </div>
+                        <p className="text-white/90 text-base italic leading-relaxed">
+                            "ElderNest makes managing my health so easy. The reminders are gentle."
+                        </p>
+                        <p className="text-white/70 mt-2 font-medium text-sm">— Margaret, 72</p>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Right Panel - Login Form */}
+            <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8"
+                style={{ backgroundColor: '#fefcfb' }}
+            >
+                <div className="w-full max-w-md">
+                    {/* Dark Mode Toggle (Decorative) */}
+                    <div className="flex justify-end mb-4">
+                        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <Sun className="w-5 h-5 text-gray-400" />
+                        </button>
+                    </div>
+
+                    {/* Header */}
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h2>
+                        <p className="text-gray-500">
+                            Access your <span className="text-orange-500 font-medium">personal dashboard</span>
+                        </p>
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        {/* Email Field */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-1">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="email"
+                                    {...register('email')}
+                                    placeholder="your.email@example.com"
+                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all bg-white"
+                                />
+                            </div>
+                            {errors.email && (
+                                <p className="text-red-500 text-sm mt-2">{errors.email.message}</p>
+                            )}
+                        </div>
+
+                        {/* Password Field */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-1">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    {...register('password')}
+                                    placeholder="••••••••"
+                                    className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all bg-white"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
+                            {errors.password && (
+                                <p className="text-red-500 text-sm mt-2">{errors.password.message}</p>
+                            )}
+                        </div>
+
+                        {/* Remember Me & Forgot Password */}
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    {...register('rememberMe')}
+                                    className="w-5 h-5 border-2 border-gray-300 rounded text-orange-500 focus:ring-orange-400 transition"
+                                />
+                                <span className="text-gray-600">Remember me</span>
+                            </label>
+                            <Link
+                                to="/auth/forgot-password"
+                                className="text-orange-500 hover:text-orange-600 font-medium transition-colors"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
+
+                        {/* Error Message */}
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-center font-medium"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
+
+                        {/* Submit Button */}
+                        <motion.button
+                            type="submit"
+                            disabled={isLoading}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full py-3 font-semibold text-white rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                            style={{
+                                background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)'
+                            }}
+                        >
+                            {isLoading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                    Signing in...
+                                </span>
+                            ) : (
+                                'Sign In'
+                            )}
+                        </motion.button>
+
+                        {/* Divider */}
+                        <div className="relative flex items-center py-2">
+                            <div className="flex-grow border-t border-gray-200"></div>
+                            <span className="px-4 text-gray-400 text-sm">Or continue with</span>
+                            <div className="flex-grow border-t border-gray-200"></div>
+                        </div>
+
+                        {/* Google Login */}
+                        <OAuthButton
+                            role="elder"
+                            onSuccess={() => navigate('/')}
+                            onError={(msg) => setError(msg)}
+                        />
+
+                        {/* Sign Up Link */}
+                        <p className="text-center text-gray-600 pt-2">
+                            New to ElderNest?{' '}
+                            <Link 
+                                to="/auth/signup" 
+                                className="text-orange-500 font-semibold hover:text-orange-600 transition-colors"
+                            >
+                                Create an account
+                            </Link>
+                        </p>
+                    </form>
+                </div>
+            </motion.div>
+        </div>
     );
 };
 

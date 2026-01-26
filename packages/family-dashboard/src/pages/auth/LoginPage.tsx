@@ -61,7 +61,7 @@ const LoginPage = () => {
                         <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
                             <Shield className="w-8 h-8 text-blue-200" />
                         </div>
-                        <span className="text-2xl font-bold tracking-tight">ElderGuard Family</span>
+                        <span className="text-2xl font-bold tracking-tight">ElderNest Family</span>
                     </div>
                     <h1 className="text-5xl font-bold leading-tight mb-6">
                         Stay connected with <br /> <span className="text-blue-200">your loved ones.</span>
@@ -116,8 +116,7 @@ const LoginPage = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
                         <FormInput
-                            label=""
-                            placeholder='Email address'
+                            label="Email address"
                             type="email"
                             sizeVariant="family"
                             {...register('email')}
@@ -127,8 +126,7 @@ const LoginPage = () => {
                         />
 
                         <FormInput
-                            label=""
-                            placeholder='Password'
+                            label="Password"
                             type="password"
                             sizeVariant="family"
                             {...register('password')}
@@ -188,7 +186,7 @@ const LoginPage = () => {
                         />
 
                         <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-                            New to ElderGuardAI?{' '}
+                            New to ElderNest?{' '}
                             <Link to="/auth/signup" className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                                 Create an account
                             </Link>

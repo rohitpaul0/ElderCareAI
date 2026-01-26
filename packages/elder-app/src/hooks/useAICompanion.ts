@@ -55,6 +55,10 @@ interface UseAICompanionReturn {
 
     // Proactive
     lastProactiveMessage: ChatMessage | null;
+
+    // Camera Mood
+    detectMoodFromImage: (imageBase64: string) => void;
+    detectedImageMood: string | null;
 }
 
 export function useAICompanion(options: UseAICompanionOptions): UseAICompanionReturn {
@@ -71,6 +75,7 @@ export function useAICompanion(options: UseAICompanionOptions): UseAICompanionRe
     const [currentMood, setCurrentMood] = useState<string | null>(null);
     const [upcomingRoutines, setUpcomingRoutines] = useState<Routine[]>([]);
     const [lastProactiveMessage, setLastProactiveMessage] = useState<ChatMessage | null>(null);
+    const [detectedImageMood, setDetectedImageMood] = useState<string | null>(null);
 
     const socketRef = useRef<Socket | null>(null);
 
@@ -128,6 +133,13 @@ export function useAICompanion(options: UseAICompanionOptions): UseAICompanionRe
         socket.on('routines:upcoming', (routines: Routine[]) => {
             setUpcomingRoutines(routines);
         });
+
+        socket.on('mood:detected', (data: { mood: string, source: string }) => {
+            if (data.source === 'camera') {
+                setDetectedImageMood(data.mood);
+                setCurrentMood(data.mood);
+            }
+        });
     }, [serverUrl, elderId, elderName]);
 
     // Disconnect
@@ -166,6 +178,12 @@ export function useAICompanion(options: UseAICompanionOptions): UseAICompanionRe
         setUpcomingRoutines(prev => prev.filter(r => r.id !== routineId));
     }, [elderId]);
 
+    // Detect mood from image
+    const detectMoodFromImage = useCallback((imageBase64: string) => {
+        socketRef.current?.emit('mood:image', { image: imageBase64, elderId });
+        setDetectedImageMood(null); // Reset while loading
+    }, [elderId]);
+
     // Auto-connect on mount
     useEffect(() => {
         if (autoConnect) {
@@ -189,6 +207,8 @@ export function useAICompanion(options: UseAICompanionOptions): UseAICompanionRe
         upcomingRoutines,
         acknowledgeRoutine,
         lastProactiveMessage,
+        detectMoodFromImage,
+        detectedImageMood,
     };
 }
 

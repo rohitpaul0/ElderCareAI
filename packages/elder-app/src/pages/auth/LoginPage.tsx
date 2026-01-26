@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Heart, Sun, Leaf } from 'lucide-react';
 import { z } from 'zod';
@@ -18,6 +18,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const roleParam = searchParams.get('role');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +36,11 @@ const LoginPage = () => {
         setError(null);
         try {
             await signInWithEmail(data.email, data.password);
-            navigate('/dashboard'); // Redirect to elder dashboard
+            if (roleParam === 'family') {
+                navigate('/family');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err: any) {
             setError(getFriendlyErrorMessage(err.code));
         } finally {
@@ -51,7 +57,9 @@ const LoginPage = () => {
                 transition={{ duration: 0.6 }}
                 className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
                 style={{
-                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)'
+                    background: roleParam === 'family'
+                        ? 'linear-gradient(135deg, #0f172a 0%, #0891b2 50%, #059669 100%)'
+                        : 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)'
                 }}
             >
                 {/* Decorative Elements */}
@@ -97,12 +105,25 @@ const LoginPage = () => {
 
                         {/* Main Tagline */}
                         <h1 className="text-4xl font-bold leading-tight mb-4">
-                            Your companion<br />
-                            for a healthier,<br />
-                            <span className="text-yellow-200">happier life.</span>
+                            {roleParam === 'family' ? (
+                                <>
+                                    Monitor your<br />
+                                    loved ones based on,<br />
+                                    <span className="text-teal-200">Real-time Data.</span>
+                                </>
+                            ) : (
+                                <>
+                                    Your companion<br />
+                                    for a healthier,<br />
+                                    <span className="text-yellow-200">happier life.</span>
+                                </>
+                            )}
                         </h1>
                         <p className="text-lg text-white/80 max-w-md leading-relaxed">
-                            Simple health tracking, timely reminders, and caring support - all designed just for you.
+                            {roleParam === 'family'
+                                ? "Peace of mind for you. Safety and independence for them. Stay connected always."
+                                : "Simple health tracking, timely reminders, and caring support - all designed just for you."
+                            }
                         </p>
                     </div>
 
@@ -144,7 +165,9 @@ const LoginPage = () => {
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h2>
                         <p className="text-gray-500">
-                            Access your <span className="text-orange-500 font-medium">personal dashboard</span>
+                            Access your <span className={`font-medium ${roleParam === 'family' ? 'text-teal-600' : 'text-orange-500'}`}>
+                                {roleParam === 'family' ? 'Family Portal' : 'personal dashboard'}
+                            </span>
                         </p>
                     </div>
 
@@ -232,7 +255,9 @@ const LoginPage = () => {
                             whileTap={{ scale: 0.98 }}
                             className="w-full py-3 font-semibold text-white rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
                             style={{
-                                background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)'
+                                background: roleParam === 'family'
+                                    ? 'linear-gradient(135deg, #0891b2 0%, #059669 100%)'
+                                    : 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)'
                             }}
                         >
                             {isLoading ? (
@@ -266,10 +291,10 @@ const LoginPage = () => {
                         <p className="text-center text-gray-600 pt-2">
                             New to ElderNest?{' '}
                             <Link
-                                to="/auth/signup"
-                                className="text-orange-500 font-semibold hover:text-orange-600 transition-colors"
+                                to={roleParam === 'family' ? "/auth/signup?role=family" : "/auth/signup"}
+                                className={`font-semibold hover:opacity-80 transition-colors ${roleParam === 'family' ? 'text-teal-600' : 'text-orange-500'}`}
                             >
-                                Create an account
+                                {roleParam === 'family' ? 'Create a Family Account' : 'Create an account'}
                             </Link>
                         </p>
                     </form>

@@ -246,9 +246,56 @@ function generateFallbackResponse(context: ConversationContext): AIResponse {
     };
 }
 
+
+/**
+ * Analyze mood from an image using Gemini Vision
+ */
+export async function analyzeImageMood(imageBase64: string): Promise<string> {
+    try {
+        if (!model) {
+            console.warn('AI not configured, simulating image mood analysis');
+            return 'happy'; // Simulation
+        }
+
+        // Clean base64 string
+        const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+
+        const prompt = "Analyze the facial expression and mood of the person in this image. Return ONLY one of the following words that best matches: happy, sad, anxious, lonely, neutral, distressed. If you can't see a face clearly, return 'neutral'.";
+
+        const result = await model.generateContent([
+            prompt,
+            {
+                inlineData: {
+                    mimeType: 'image/jpeg',
+                    data: base64Data
+                }
+            }
+        ]);
+
+        const text = result.response.text().trim().toLowerCase();
+
+        // Validate result
+        const validMoods = ['happy', 'sad', 'anxious', 'lonely', 'neutral', 'distressed'];
+        if (validMoods.includes(text)) {
+            return text;
+        }
+
+        // Fallback if AI returns sentence
+        for (const mood of validMoods) {
+            if (text.includes(mood)) return mood;
+        }
+
+        return 'neutral';
+    } catch (error) {
+        console.error('Image analysis error:', error);
+        return 'neutral';
+    }
+}
+
 export default {
     initializeAI,
     generateResponse,
     generateProactiveMessage,
     clearSession,
+    analyzeImageMood,
 };

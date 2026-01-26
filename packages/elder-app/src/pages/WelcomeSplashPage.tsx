@@ -121,10 +121,11 @@ const WelcomeSplashPage = () => {
     const taglineWords = ['Predict.', 'Protect.', 'Prevent.'];
 
     // Floating particles configuration
+    // Floating particles configuration
     const particles = [
         { delay: 0, duration: 8, startX: 100, startY: 200, icon: '❤️' },
         { delay: 1.5, duration: 9, startX: 300, startY: 400, icon: '🛡️' },
-        { delay: 0.5, duration: 7, startX: 500, startY: 150, icon: '🤝' },
+        // Handshake removed
         { delay: 2, duration: 10, startX: 700, startY: 350, icon: '💊' },
         { delay: 1, duration: 8, startX: 200, startY: 500, icon: '🏥' },
         { delay: 2.5, duration: 9, startX: 600, startY: 250, icon: '✨' },

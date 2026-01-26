@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { ChatMessage, ElderProfile, ConversationContext } from './types';
 import { generateResponse, clearSession } from './ai-service';
 import { getUpcomingRoutines, getRoutinesForElder } from './routine-scheduler';
+import { assessRisk, RiskResult } from './risk-assessor';
 
 // Store conversation history per elder (in production, use database)
 const conversationHistory: Map<string, ChatMessage[]> = new Map();
@@ -138,6 +139,18 @@ export function initializeChatHandler(io: SocketIOServer): void {
             // Acknowledge receipt
             socket.emit('chat:received', { messageId: userMessage.id });
 
+            // Start Risk Assessment
+            const risk = assessRisk(history);
+            if (risk.level === 'critical' || risk.level === 'high') {
+                io.to(`family:${elderId}`).emit('elder:risk-alert', {
+                    elderId,
+                    level: risk.level,
+                    factors: risk.factors,
+                    timestamp: new Date()
+                });
+                console.log(`🚨 RISK ALERT for ${elderId}: ${risk.level}`);
+            }
+
             // Show typing indicator
             socket.emit('chat:typing', { isTyping: true });
 
@@ -247,6 +260,49 @@ export function initializeChatHandler(io: SocketIOServer): void {
         socket.on('family:join', (data: { elderId: string; familyId: string }) => {
             socket.join(`family:${data.elderId}`);
             console.log(`👨‍👩‍👧 Family member joined for elder: ${data.elderId}`);
+        });
+
+        // Handle mood detection from image
+        socket.on('mood:image', async (data: { image: string; elderId?: string }) => {
+            const elderId = data.elderId || currentElderId || 'elder-demo';
+            console.log(`📸 Received image for mood analysis from ${elderId}`);
+
+            try {
+                // Import dynamically to avoid circular dependency issues if any
+                const { analyzeImageMood } = await import('./ai-service');
+                const detectedMood = await analyzeImageMood(data.image);
+
+                console.log(`🎭 Image mood detected: ${detectedMood}`);
+
+                // Send result back to elder
+                socket.emit('mood:detected', {
+                    source: 'camera',
+                    mood: detectedMood,
+                    timestamp: new Date()
+                });
+
+                // Check for risk from mood
+                if (['sad', 'lonely', 'anxious', 'distressed'].includes(detectedMood)) {
+                    // Quick check if mood is distressed -> CRITICAL
+                    if (detectedMood === 'distressed') {
+                        io.to(`family:${elderId}`).emit('elder:risk-alert', {
+                            elderId,
+                            level: 'critical',
+                            factors: ['Distressed mood detected via camera'],
+                            timestamp: new Date()
+                        });
+                    }
+
+                    io.to(`family:${elderId}`).emit('elder:mood-alert', {
+                        elderId,
+                        mood: detectedMood,
+                        source: 'camera',
+                        timestamp: new Date(),
+                    });
+                }
+            } catch (error) {
+                console.error('Error processing image mood:', error);
+            }
         });
 
         // Handle disconnection

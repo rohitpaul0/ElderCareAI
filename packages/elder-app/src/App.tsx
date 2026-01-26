@@ -15,6 +15,14 @@ import ProfileSetupPage from "@/pages/auth/ProfileSetupPage";
 import { HomePage } from "@/pages/HomePage";
 import ChatPage from "@/pages/ChatPage";
 
+// Family Pages
+import { DashboardLayout } from "@/layout/family/DashboardLayout";
+import { DashboardPage } from "@/pages/family/DashboardPage";
+import { ActivityPage } from "@/pages/family/ActivityPage";
+import { AlertsPage } from "@/pages/family/AlertsPage";
+import { ProfilePage } from "@/pages/family/ProfilePage";
+import { SettingsPage } from "@/pages/family/SettingsPage";
+
 import { ProtectedRoute } from "@elder-nest/shared";
 
 const queryClient = new QueryClient();
@@ -41,11 +49,25 @@ function App() {
                 <HomePage />
               </ProtectedRoute>
             } />
+
             <Route path="/chat" element={
               <ProtectedRoute allowedRoles={['elder']}>
                 <ChatPage />
               </ProtectedRoute>
             } />
+
+            {/* Family Portal Routes */}
+            <Route path="/family" element={
+              <ProtectedRoute allowedRoles={['family']}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<DashboardPage />} />
+              <Route path="activity" element={<ActivityPage />} />
+              <Route path="alerts" element={<AlertsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
           </Routes>
         </div>
       </BrowserRouter>

@@ -33,6 +33,7 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "../elder-app/src/pages/auth/ElderSignupPage.tsx"
   ]
 }

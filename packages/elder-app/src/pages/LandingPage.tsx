@@ -4,7 +4,8 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import {
     Shield, Heart, Brain, Eye, Bell, Calendar, Users, ChevronDown,
     ArrowRight, Play, Star, Menu, X, Quote, Target, Sparkles,
-    CheckCircle2, Phone, Mail, MapPin, Twitter, Facebook, Linkedin, Instagram, User
+    CheckCircle2, Phone, Mail, MapPin, Twitter, Facebook, Linkedin, Instagram, User,
+    Bot, Pill, HeartHandshake, AlertTriangle, Activity, Lock
 } from 'lucide-react';
 import HandshakeImg from '../assets/elder-robot-handshake.png';
 
@@ -269,15 +270,27 @@ const HelpSection = () => {
                             </div>
                             <h3 className="text-2xl md:text-3xl font-bold mb-4">I'm a Senior</h3>
                             <p className="text-white/80 mb-6">Get your personal AI companion. Chat anytime, get reminders, and stay connected with family who care.</p>
-                            <ul className="space-y-2 mb-8">
-                                {['🤖 Friendly AI to talk to', '💊 Medicine reminders', '👨‍👩‍👧 Family peace of mind', '🆘 Emergency button'].map(item => <li key={item} className="text-white/90">{item}</li>)}
+                            <ul className="space-y-4 mb-8">
+                                {[
+                                    { icon: Bot, text: 'Friendly AI to talk to' },
+                                    { icon: Pill, text: 'Medicine reminders' },
+                                    { icon: HeartHandshake, text: 'Family peace of mind' },
+                                    { icon: AlertTriangle, text: 'Emergency button' }
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-center gap-3 text-white/90">
+                                        <div className="p-1.5 bg-white/10 rounded-lg">
+                                            <item.icon className="w-4 h-4 text-white" />
+                                        </div>
+                                        {item.text}
+                                    </li>
+                                ))}
                             </ul>
                             <button className="w-full py-4 bg-white text-blue-900 rounded-xl font-bold text-lg group-hover:shadow-xl transition-all">Sign In as Elder</button>
                         </div>
                     </motion.div>
 
                     {/* Family Card */}
-                    <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} whileHover={{ scale: 1.02 }} onClick={() => window.location.href = 'http://localhost:5173/auth/login?role=family'} className="relative overflow-hidden rounded-3xl p-6 md:p-8 cursor-pointer group" style={{ background: `linear-gradient(135deg, ${colors.warmCareTeal}, ${colors.lifeGreen})` }}>
+                    <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} whileHover={{ scale: 1.02 }} onClick={() => navigate('/auth/login?role=family')} className="relative overflow-hidden rounded-3xl p-6 md:p-8 cursor-pointer group" style={{ background: `linear-gradient(135deg, ${colors.warmCareTeal}, ${colors.lifeGreen})` }}>
                         <div className="text-white">
                             <div className="mb-6 flex justify-center lg:justify-start">
                                 <div className="p-4 bg-white/20 rounded-2xl w-fit backdrop-blur-sm">
@@ -286,8 +299,20 @@ const HelpSection = () => {
                             </div>
                             <h3 className="text-2xl md:text-3xl font-bold mb-4">I'm a Family Member</h3>
                             <p className="text-white/80 mb-6">Monitor your elderly loved ones. Get instant alerts, view health trends, and ensure they're safe - even from afar.</p>
-                            <ul className="space-y-2 mb-8">
-                                {['📊 Real-time dashboard', '🚨 Instant emergency alerts', '📈 Health trend analysis', '🔒 Secure & private'].map(item => <li key={item} className="text-white/90">{item}</li>)}
+                            <ul className="space-y-4 mb-8">
+                                {[
+                                    { icon: Activity, text: 'Real-time dashboard' },
+                                    { icon: AlertTriangle, text: 'Instant emergency alerts' },
+                                    { icon: Heart, text: 'Health trend analysis' },
+                                    { icon: Lock, text: 'Secure & private' }
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-center gap-3 text-white/90">
+                                        <div className="p-1.5 bg-white/10 rounded-lg">
+                                            <item.icon className="w-4 h-4 text-white" />
+                                        </div>
+                                        {item.text}
+                                    </li>
+                                ))}
                             </ul>
                             <button className="w-full py-4 bg-white text-teal-900 rounded-xl font-bold text-lg group-hover:shadow-xl transition-all">Sign in as Family</button>
                         </div>

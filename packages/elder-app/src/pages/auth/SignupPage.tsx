@@ -15,7 +15,7 @@ import {
 
 type ElderSignupFormData = z.infer<typeof elderSignupSchema>;
 
-const SignupPage = () => {
+const ElderSignupForm = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [error, setError] = useState<string | null>(null);
@@ -129,8 +129,8 @@ const SignupPage = () => {
                                     }`}
                             >
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${s < step ? 'bg-green-400 text-white' :
-                                        s === step ? 'bg-white text-orange-500' :
-                                            'bg-white/30 text-white'
+                                    s === step ? 'bg-white text-orange-500' :
+                                        'bg-white/30 text-white'
                                     }`}>
                                     {s < step ? <Check size={16} /> : s}
                                 </div>
@@ -470,4 +470,4 @@ const SignupPage = () => {
     );
 };
 
-export default SignupPage;
+export default ElderSignupForm;

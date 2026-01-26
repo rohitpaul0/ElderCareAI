@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LandingPage } from "@/pages/LandingPage";
+
 
 import { DashboardLayout } from "@/layout/DashboardLayout";
 
@@ -30,8 +30,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* Landing */}
-          <Route path="/" element={<LandingPage />} />
+          {/* Landing - Redirect to Login */}
+          <Route path="/" element={<Navigate to="/auth/login?role=family" replace />} />
 
           {/* Auth */}
           <Route path="/auth/login" element={<LoginPage />} />

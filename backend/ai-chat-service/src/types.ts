@@ -94,7 +94,8 @@ export type ServerToClientEvents = {
     'routine:reminder': RoutineReminder;
     'routines:upcoming': Routine[];
     'companion:proactive': ChatMessage;
-    'elder:mood-alert': { elderId: string; mood: string; message: string; timestamp: Date };
+    'elder:mood-alert': { elderId: string; mood: string; message?: string; source?: string; timestamp: Date };
+    'elder:risk-alert': { elderId: string; level: string; factors: string[]; timestamp: Date };
     'elder:typing': { elderId: string };
     'routine:completed': { elderId: string; routineId: string; completedAt: Date };
     'error': { message: string; code: string };

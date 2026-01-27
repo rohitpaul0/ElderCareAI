@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Users, AlertTriangle, Activity, Server } from 'lucide-react';
 
 const MetricCard = ({ title, value, change, icon: Icon, trend }: any) => (

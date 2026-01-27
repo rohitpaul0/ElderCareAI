@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
@@ -88,6 +89,12 @@ export const AdminLoginPage = () => {
                             >
                                 Authenticate
                             </Button>
+
+                            <div className="text-center pt-2">
+                                <Link to="/signup" className="text-xs text-slate-500 hover:text-blue-400 transition-colors">
+                                    Need access? Register here
+                                </Link>
+                            </div>
                         </form>
 
                         <div className="mt-8 flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/10 rounded-lg">

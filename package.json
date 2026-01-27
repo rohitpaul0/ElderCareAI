@@ -11,7 +11,7 @@
         "dev:api": "npm run dev --prefix backend/node-api",
         "dev:chat": "npm run dev --prefix backend/ai-chat-service",
         "dev:ml": "cd backend/python-ml && uvicorn app.main:app --reload --port 8000",
-        "dev": "concurrently -n \"ELDER,FAMILY,API,CHAT\" -c \"bgGreen.bold,bgTeal.bold,bgBlue.bold,bgMagenta.bold\" \"npm run dev:elder\" \"npm run dev:family\" \"npm run dev:api\" \"npm run dev:chat\"",
+        "dev": "concurrently -n \"ELDER,API,CHAT\" -c \"bgGreen.bold,bgBlue.bold,bgMagenta.bold\" \"npm run dev:elder\" \"npm run dev:api\" \"npm run dev:chat\"",
         "build": "npm run build --workspaces"
     },
     "devDependencies": {
